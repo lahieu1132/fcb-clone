@@ -5,6 +5,7 @@ const UserController = require("../controller/UserController");
 
 router.post("/login", UserController.apiCheckUser);
 router.post("/register", UserController.apiCreateUser);
+router.post("/check", UserController.apiCheckEmail);
 router.get("/", UserController.apiGetAllUsers);
 
 module.exports = router;

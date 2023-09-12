@@ -1,15 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, MouseEvent, useEffect } from "react";
 import { Link } from "react-router-dom";
-import heplIcon from "../assets/images/info.png";
+import heplIcon from "../../assets/images/info.png";
+import type { AppDispatch, RootState } from "../../app/store";
+import { useSelector, useDispatch } from "react-redux";
+import { login, reset } from "../../services/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 interface LoginProps {
   isLogin?: boolean;
+  email: string;
 }
 
 function LoginRegist(props: LoginProps) {
-  const { isLogin } = props;
-
+  const { isLogin, email } = props;
+  const navigate = useNavigate();
+  const [password, setPassword] = useState<string>("");
   const [hidenPass, setHidenPass] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { isLoading, isError, isSuccess } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const onChangePass = (e: React.FormEvent<HTMLInputElement>): void => {
+    setPassword(e.currentTarget.value.trim());
+  };
+
+  useEffect(() => {
+    if (isError) setError(true);
+
+    if (isSuccess) {
+      setError(false);
+      navigate("/");
+    }
+
+    dispatch(reset());
+  }, [isLoading, isError, isSuccess, dispatch]);
+  console.log(isError);
+  const onLogin = async (
+    event: MouseEvent<HTMLButtonElement>
+  ): Promise<void> => {
+    if (isLogin) {
+      await dispatch(login({ email, password }));
+    } else {
+      console.log(event);
+    }
+  };
+
   return (
     <>
       <div>
@@ -17,16 +55,19 @@ function LoginRegist(props: LoginProps) {
           {isLogin ? "Hello Culer!" : "Set up your password"}
         </p>
         <p className='text-sm font-normal text-white mb-5'>Your Email:</p>
-        <p className='text-sm font-normal text-white mb-8'>
-          lahieu2401@gmail.com
-        </p>
+        <p className='text-sm font-normal text-white mb-8'>{email}</p>
         <div className='relative mb-8'>
           <input
             placeholder='Password'
-            className='input'
+            className={`input ${error && "border-[#ff4264]"}`}
             name='text'
+            value={password}
+            onChange={onChangePass}
             type={hidenPass ? "text" : "password"}
           />
+          {error && (
+            <p className='mt-2 text-[#ff4264] text-sm'>Invalid email format</p>
+          )}
           <button
             className='absolute right-3 top-[13px]'
             onClick={() => setHidenPass(!hidenPass)}
@@ -65,6 +106,7 @@ function LoginRegist(props: LoginProps) {
             )}
           </button>
         </div>
+
         {isLogin ? (
           <>
             <div className='text-right text-sm text-[#4a8aeb] underline decoration-1 hover:no-underline	'>
@@ -257,7 +299,7 @@ function LoginRegist(props: LoginProps) {
           </>
         )}
       </div>
-      <button className='button bg-[#cf122d]'>
+      <button className='button bg-[#cf122d]' onClick={onLogin}>
         {isLogin ? "LOG IN" : "SIGN UP"}
       </button>
     </>

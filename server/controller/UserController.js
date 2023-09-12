@@ -26,6 +26,24 @@ class UserController {
   //   }
   // }
 
+  async apiCheckEmail(req, res) {
+    try {
+      const client = await userService.checkEmail(req.body.email);
+      if (client) {
+        res.status(200).json({
+          error: false,
+          message: "Email is exist",
+        });
+      } else
+        res.status(200).json({
+          error: true,
+          message: "Email is not exist",
+        });
+    } catch (error) {
+      res.status(500).json({ error: error });
+    }
+  }
+
   async apiCheckUser(req, res, next) {
     const { errors, isValid } = signinValidation(req.body);
     if (!isValid) return res.status(400).json(errors);

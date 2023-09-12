@@ -1,20 +1,17 @@
-import React, { SyntheticEvent, useState } from "react";
-import logo from "../assets/images/logo.png";
-import "../assets/scss/login.scss";
+import React, { useState } from "react";
+import logo from "../../assets/images/logo.png";
+import "../../styles/login.scss";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
-import LoginRegist from "../components/LoginRegist";
-import LoginCheckEmail from "../components/LoginCheckEmail";
+import LoginRegist from "./LoginRegist";
+import LoginCheckEmail from "./LoginCheckEmail";
 
-const Login = () => {
+const Login = React.memo(() => {
   const [isRegist, setIsRegist] = useState<boolean>(false);
-  const [hidenPass, setHidenPass] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>("true");
+  const [isLogin, setIsLogin] = useState<boolean>(false);
 
-  const onSubmit = (e: SyntheticEvent): void => {
-    e.preventDefault();
-    console.log(e);
-    setIsRegist(true);
-  };
+  console.log(isLogin);
 
   return (
     <>
@@ -45,9 +42,13 @@ const Login = () => {
             data-aura-rendered-by='125:0'
           />
           {isRegist ? (
-            <LoginRegist isLogin />
+            <LoginRegist isLogin={!isLogin} email={email} />
           ) : (
-            <LoginCheckEmail onSubmit={onSubmit} />
+            <LoginCheckEmail
+              setIsRegist={() => setIsRegist(true)}
+              checkedEmail={(e: string) => setEmail(e)}
+              setIsLogin={(e: boolean) => setIsLogin(e)}
+            />
           )}
           <ul className='flex flex-row justify-center text-white text-sm opacity-60'>
             <li className='px-2 '>
@@ -64,6 +65,6 @@ const Login = () => {
       </div>
     </>
   );
-};
+});
 
 export default Login;
