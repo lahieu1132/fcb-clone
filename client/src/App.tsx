@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 function App() {
   return (
     <>
-      <div className='App bg-[#181733] '>
+      <div className='App bg-[#181733] min-h-screen'>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />

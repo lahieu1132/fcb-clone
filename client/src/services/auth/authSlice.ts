@@ -28,23 +28,26 @@ const initialState: stateInterrface = {
 // Register user
 
 export const register = createAsyncThunk<User, User, { rejectValue: string }>(
-  "client/register",
+  "auth/register",
   async (user: User) => {
-    return await authService.register(user);
+    return authService.register(user);
   }
 );
 
 export const checkEmail = createAsyncThunk(
-  "client/checkEmail",
+  "auth/checkEmail",
   async (email: string) => {
     return await authService.checkEmail(email);
   }
 );
 
 // Login user
-export const login = createAsyncThunk("auth/login", async (user: User) => {
-  return await authService.login(user);
-});
+export const login = createAsyncThunk(
+  "auth/login",
+  async (data: { user: User; keepLogIn: boolean }) => {
+    return await authService.login(data.user, data.keepLogIn);
+  }
+);
 
 // export const logout = createAsyncThunk("auth/logout", async () => {
 //   await authService.logout();

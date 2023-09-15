@@ -11,8 +11,6 @@ const Login = React.memo(() => {
   const [email, setEmail] = useState<string>("true");
   const [isLogin, setIsLogin] = useState<boolean>(false);
 
-  console.log(isLogin);
-
   return (
     <>
       <Helmet>

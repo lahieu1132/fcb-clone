@@ -1,10 +1,11 @@
-import React, { useState, MouseEvent, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import heplIcon from "../../assets/images/info.png";
 import type { AppDispatch, RootState } from "../../app/store";
 import { useSelector, useDispatch } from "react-redux";
-import { login, reset } from "../../services/auth/authSlice";
+import { login, reset, register } from "../../services/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 interface LoginProps {
   isLogin?: boolean;
@@ -17,6 +18,7 @@ function LoginRegist(props: LoginProps) {
   const [password, setPassword] = useState<string>("");
   const [hidenPass, setHidenPass] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [isKeep, setIsKeep] = useState<boolean>(false);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -32,19 +34,37 @@ function LoginRegist(props: LoginProps) {
 
     if (isSuccess) {
       setError(false);
-      navigate("/");
     }
-
     dispatch(reset());
   }, [isLoading, isError, isSuccess, dispatch]);
-  console.log(isError);
-  const onLogin = async (
-    event: MouseEvent<HTMLButtonElement>
-  ): Promise<void> => {
+
+  const onLogin = async (): Promise<void> => {
+    const data = {
+      user: {
+        email,
+        password,
+      },
+      keepLogIn: isKeep,
+    };
     if (isLogin) {
-      await dispatch(login({ email, password }));
+      dispatch(login(data)).then(() => {
+        navigate("/");
+      });
     } else {
-      console.log(event);
+      try {
+        dispatch(register({ email, password }))
+          .then(unwrapResult)
+          .then(() => {
+            dispatch(login(data)).then(() => {
+              navigate("/");
+            });
+          })
+          .catch((rejectedValueOrSerializedError) => {
+            console.log(rejectedValueOrSerializedError);
+          });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -114,8 +134,17 @@ function LoginRegist(props: LoginProps) {
             </div>
             <div className='mt-4 mb-10 flex flex-row justify-between items-center'>
               <div className='checkbox-wrapper mb-1'>
-                <input id='terms-checkbox-37' name='checkbox' type='checkbox' />
-                <label className='terms-label' htmlFor='terms-checkbox-37'>
+                <input
+                  id='terms-checkbox-37'
+                  checked={isKeep}
+                  name='checkbox'
+                  type='checkbox'
+                />
+                <label
+                  className='terms-label'
+                  htmlFor='terms-checkbox-37'
+                  onClick={() => setIsKeep(!isKeep)}
+                >
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
