@@ -4,7 +4,7 @@ const API_URL = import.meta.env.REACT_APP_API_URL + "/users";
 
 interface userInterface {
   email: string;
-  password: string;
+  password?: string;
   refreshToken?: string;
   accessToken?: string;
 }
@@ -17,33 +17,41 @@ const checkEmail = async (email: string) => {
 // Register user
 const register = async (userData: userInterface) => {
   const response = await instance.post(API_URL + "/register", userData);
-
-  if (response.data) {
-    // localStorage.setItem("user", JSON.stringify(response.data));
-    console.log(response.data);
-  }
-
   return response.data;
 };
 
 // Login user
 const login = async (userData: userInterface, keepLogIn: boolean) => {
   const response = await instance.post(API_URL + "/login", userData);
-
-  if (response.data && keepLogIn) {
-    localStorage.setItem("user", JSON.stringify(response.data));
+  console.log(keepLogIn);
+  if (response.data) {
+    localStorage.setItem(
+      "accessToken",
+      JSON.stringify(response.data.accessToken)
+    );
+    localStorage.setItem(
+      "refreshToken",
+      JSON.stringify(response.data.refreshToken)
+    );
   }
-  localStorage.removeItem("user");
+  if (keepLogIn) {
+    localStorage.setItem("keepLogIn", JSON.stringify(true));
+  }
+
   return response.data;
 };
 
 // Logout user
 const logout = () => {
-  localStorage.removeItem("user");
+  localStorage.clear();
 };
 
-const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem("user") ?? "null") as userInterface;
+const getCurrentUser = async () => {
+  const response = await instance.get(API_URL + "/info");
+  if (response.data) {
+    localStorage.setItem("user", response.data);
+  }
+  return response.data;
 };
 
 const authService = {

@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "./token.ts";
 
 const instance = axios.create({
-  baseURL: import.meta.env.BASE_URL,
+  baseURL: import.meta.env.REACT_APP_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -12,7 +12,8 @@ instance.interceptors.request.use(
   (config) => {
     const token = TokenService.getLocalAccessToken();
     if (token) {
-      config.headers["Authorization"] = "Bearer " + token; // for Spring Boot back-end
+      console.log(token);
+      config.headers["Authorization"] = `Bearer ${token}`; // for Spring Boot back-end
       // config.headers["x-access-token"] = token; // for Node.js Express back-end
     }
     return config;
@@ -29,7 +30,7 @@ instance.interceptors.response.use(
   async (err) => {
     const originalConfig = err.config;
 
-    if (originalConfig.url !== "/users/login" && err.response) {
+    if (err.response) {
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
 
@@ -40,7 +41,6 @@ instance.interceptors.response.use(
 
           const { accessToken } = rs.data;
           TokenService.updateLocalAccessToken(accessToken);
-
           return instance(originalConfig);
         } catch (_error) {
           return Promise.reject(_error);

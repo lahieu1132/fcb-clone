@@ -16,15 +16,14 @@ class UserController {
       res.status(500).json({ error: error });
     }
   }
-  //  async apiGetclientById(req, res, next) {
-  //   try {
-  //     let id = req.params.id || {};
-  //     const client = await clientService.getclientbyId(id);
-  //     res.json(client);
-  //   } catch (error) {
-  //     res.status(500).json({ error: error });
-  //   }
-  // }
+  async apiGetclientById(req, res, next) {
+    try {
+      const client = await userService.getUserInfo(req.auth._id);
+      res.json(client);
+    } catch (error) {
+      res.status(500).json({ error: error });
+    }
+  }
 
   async apiCheckEmail(req, res) {
     try {

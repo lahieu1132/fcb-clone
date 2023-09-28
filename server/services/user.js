@@ -35,4 +35,15 @@ module.exports = class userService {
       console.log(`client not found. ${error}`);
     }
   }
+
+  static async getUserInfo(id) {
+    console.log(id);
+    try {
+      const user = await User.findById(id).select("-password");
+      console.log(user);
+      return user;
+    } catch (error) {
+      console.log(`client not found. ${error}`);
+    }
+  }
 };

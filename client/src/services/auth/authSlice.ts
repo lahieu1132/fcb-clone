@@ -3,7 +3,8 @@ import authService from "./authService";
 
 interface User {
   email: string;
-  password: string;
+  password?: string;
+  firstName?: string;
 }
 
 interface stateInterrface {
@@ -14,11 +15,8 @@ interface stateInterrface {
   message?: string;
 }
 
-// Get user from localStorage
-const user: User = JSON.parse(localStorage.getItem("user") ?? "null") as User;
-
 const initialState: stateInterrface = {
-  user: user,
+  user: null,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -49,9 +47,13 @@ export const login = createAsyncThunk(
   }
 );
 
-// export const logout = createAsyncThunk("auth/logout", async () => {
-//   await authService.logout();
-// });
+export const getUser = createAsyncThunk("auth/getUser", async () => {
+  return await authService.getCurrentUser();
+});
+
+export const logout = createAsyncThunk("auth/logout", async () => {
+  await authService.logout();
+});
 
 export const authSlice = createSlice({
   name: "auth",
@@ -69,10 +71,9 @@ export const authSlice = createSlice({
       .addCase(register.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.user = action.payload;
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
@@ -88,20 +89,27 @@ export const authSlice = createSlice({
       .addCase(login.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(login.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.user = action.payload;
       })
       .addCase(login.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
         state.message = "";
         state.user = null;
+      })
+      .addCase(getUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
       });
-    //   .addCase(logout.fulfilled, (state) => {
-    //     state.user = null;
-    //   });
   },
 });
 

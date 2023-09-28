@@ -1,46 +1,27 @@
-interface User {
-  email: string;
-  password: string;
-  refreshToken: string;
-  accessToken: string;
-}
-
 class TokenService {
   getLocalRefreshToken() {
-    const user: User = JSON.parse(
-      localStorage.getItem("user") ?? "null"
-    ) as User;
+    const refreshToken = JSON.parse(
+      localStorage.getItem("refreshToken") ?? "null"
+    );
 
-    return user?.refreshToken;
+    return refreshToken;
   }
 
   getLocalAccessToken() {
-    const user: User = JSON.parse(
-      localStorage.getItem("user") ?? "null"
-    ) as User;
+    const accessToken = JSON.parse(
+      localStorage.getItem("accessToken") ?? "null"
+    );
 
-    return user?.accessToken;
+    return accessToken;
   }
 
   updateLocalAccessToken(token: string) {
-    const user: User = JSON.parse(
-      localStorage.getItem("user") ?? "null"
-    ) as User;
-    user.accessToken = token;
-    localStorage.setItem("user", JSON.stringify(user));
-  }
-
-  getUser() {
-    return JSON.parse(localStorage.getItem("user") ?? "null") as User;
-  }
-
-  setUser(user: User) {
-    console.log(JSON.stringify(user));
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("accessToken", JSON.stringify(token));
   }
 
   removeUser() {
-    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   }
 }
 
